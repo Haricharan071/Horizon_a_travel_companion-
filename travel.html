@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Find Your Bliss | Horizon Travel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Poppins:wght@300;400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <style>
+    /* =========================================
+       1. HERO LANDING PAGE STYLES
+       ========================================= */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #2c3e50; 
+     /* Change it to this: */
+      background-image: url('pietro-de-grandi-T7K4aEPoGGk-unsplash.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .top-nav {
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
+    }
+    
+    .top-nav .logo {
+      color: white;
+      font-size: 1.2rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+    }
+
+    .hero-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: white;
+      text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      margin-top: -50px; 
+    }
+
+    .hero-content h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 5rem;
+      font-weight: 400;
+      margin-bottom: 10px;
+    }
+
+    .hero-content p {
+      font-size: 1.2rem;
+      font-weight: 300;
+      margin-bottom: 35px;
+      letter-spacing: 1px;
+    }
+
+    .ask-bot-btn {
+      background: white;
+      color: #333;
+      border: none;
+      padding: 15px 40px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    
+    .ask-bot-btn:hover {
+      background: #f0f0f0;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    }
+
+    /* =========================================
+       2. MODAL (POPUP) OVERLAY STYLES
+       ========================================= */
+    .bot-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      display: none; 
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .bot-modal-overlay.active {
+      display: flex;
+      animation: fadeIn 0.3s forwards;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    /* =========================================
+       3. BOT STYLES (SCOPED)
+       ========================================= */
+    :root {
+      --bg: #10151c;
+      --surface: #19212a;
+      --panel: #202b36;
+      --border: #324355;
+      --accent: #00f0d2;
+      --accent2: #ffc93c;
+      --accent3: #ff7f50;
+      --text: #e0f2f1;
+      --text-dim: #6d8ba0;
+      --glow: 0 0 20px rgba(0,240,210,0.3);
+    }
+
+    .app-wrapper {
+      position: relative; background: var(--bg); width: 100%; max-width: 800px;
+      height: 85vh; max-height: 750px; display: flex; flex-direction: column;
+      border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); overflow: hidden;
+      transform: translateY(20px); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .bot-modal-overlay.active .app-wrapper { transform: translateY(0); }
+
+    .app-wrapper::before {
+      content: ''; position: absolute; inset: 0;
+      background-image: linear-gradient(rgba(0,240,210,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,240,210,0.03) 1px, transparent 1px);
+      background-size: 50px 50px; pointer-events: none; z-index: 0;
+    }
+    .app-wrapper::after {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 80% 20%, rgba(255,201,60,0.07) 0%, transparent 50%), radial-gradient(ellipse at 50% 50%, rgba(0,240,210,0.04) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+    .app-wrapper > * { z-index: 10; position: relative; }
+
+    /* Bot Header */
+    .header {
+      display: flex; align-items: center; gap: 16px; padding: 20px 24px; background: var(--panel); border-bottom: 1px solid var(--border);
+    }
+    .bot-avatar {
+      width: 48px; height: 48px; background: linear-gradient(135deg, var(--accent), #00aaff); border-radius: 14px;
+      display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: var(--glow); flex-shrink: 0;
+    }
+    .header-info { flex: 1; color: var(--text); }
+    .bot-name { font-weight: 800; font-size: 1.3rem; letter-spacing: -0.01em; }
+    .bot-status { font-size: 0.8rem; color: var(--text-dim); display: flex; align-items: center; gap: 7px; margin-top: 3px; }
+    .status-dot { width: 8px; height: 8px; background: #00ffa2; border-radius: 50%; box-shadow: 0 0 10px rgba(0,255,162,0.5); }
+    .close-modal-btn { background: transparent; border: none; color: var(--text-dim); font-size: 24px; cursor: pointer; transition: color 0.2s; padding: 5px; }
+    .close-modal-btn:hover { color: var(--accent3); }
+
+    /* Quick Guide Buttons Bar */
+    .topics-bar {
+      background: rgba(27,38,54,0.95); border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; gap: 10px; align-items: center; overflow-x: auto; scrollbar-width: none;
+    }
+    .topics-bar::-webkit-scrollbar { display: none; }
+    .topics-label { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; color: var(--accent3); }
+    .topic-btn { background: transparent; border: 1px solid var(--border); color: var(--text-dim); font-family: 'Poppins', sans-serif; font-size: 0.75rem; padding: 6px 16px; cursor: pointer; white-space: nowrap; border-radius: 20px; transition: 0.2s; }
+    .topic-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,240,210,0.05); }
+
+    /* Chat Area */
+    .chat-area { flex: 1; background: var(--surface); overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+    .chat-area::-webkit-scrollbar { width: 6px; }
+    .chat-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    .message { display: flex; gap: 14px; animation: msgIn 0.3s ease both; }
+    @keyframes msgIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .message.user { flex-direction: row-reverse; }
+    .msg-avatar { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; align-self: flex-end; }
+    .message.bot .msg-avatar { background: rgba(0,240,210,0.1); border: 1px solid rgba(0,240,210,0.3); }
+    .message.user .msg-avatar { background: rgba(255,201,60,0.1); border: 1px solid rgba(255,201,60,0.3); }
+    
+    .msg-bubble { max-width: 80%; padding: 14px 18px; font-size: 0.9rem; line-height: 1.6; color: var(--text); font-weight: 300;}
+    .message.bot .msg-bubble { background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 12px 12px 12px 2px; }
+    .message.user .msg-bubble { background: rgba(255,201,60,0.1); border: 1px solid rgba(255,201,60,0.25); border-right: 3px solid var(--accent2); color: #fff2d0; border-radius: 12px 12px 2px 12px; }
+    .msg-meta { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; color: var(--text-dim); margin-top: 6px; }
+    .message.user .msg-meta { text-align: right; }
+
+    .typing-indicator { display: flex; gap: 14px; animation: msgIn 0.3s ease both; }
+    .typing-dots { background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: 16px 22px; display: flex; gap: 6px; align-items: center; border-radius: 12px 12px 12px 2px; }
+    .dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; animation: dotBounce 1.4s infinite; opacity: 0.6; }
+    .dot:nth-child(2) { animation-delay: 0.16s; background: var(--accent3); }
+    .dot:nth-child(3) { animation-delay: 0.32s; background: var(--accent2); }
+    @keyframes dotBounce { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-6px); opacity: 1; } }
+
+    /* Input Area */
+    .input-area { background: var(--panel); border-top: 1px solid var(--border); padding: 16px 20px; display: flex; gap: 12px; align-items: center; }
+    .input-field { flex: 1; background: var(--surface); border: 1px solid var(--border); color: var(--text); font-family: 'Poppins', sans-serif; font-size: 0.92rem; padding: 12px 16px; border-radius: 8px; outline: none; }
+    .input-field:focus { border-color: var(--accent); background: #1d2630; }
+    .input-field::placeholder { color: #4a6681; }
+    .send-btn { background: linear-gradient(135deg, var(--accent), #00aaff); border: none; color: var(--bg); font-weight: 700; padding: 12px 24px; cursor: pointer; border-radius: 8px; transition: 0.2s; }
+    .send-btn:hover:not(:disabled) { box-shadow: 0 0 15px rgba(0,240,210,0.4); transform: translateY(-1px); }
+
+    /* Welcome Card */
+    .welcome-card { background: linear-gradient(135deg, var(--panel), #161e26); border: 1px solid var(--border); border-top: 3px solid var(--accent3); padding: 30px; text-align: center; border-radius: 12px; color: var(--text); }
+    .welcome-card h2 { font-weight: 800; font-size: 1.3rem; margin-bottom: 10px; }
+    .welcome-card p { color: var(--text-dim); font-size: 0.92rem; line-height: 1.6; margin-bottom: 20px; }
+    .quick-questions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+    .quick-q { background: rgba(255,201,60,0.05); border: 1px solid rgba(255,201,60,0.2); color: var(--accent2); font-family: 'Poppins', sans-serif; font-size: 0.75rem; padding: 8px 18px; cursor: pointer; border-radius: 20px; transition: 0.2s; }
+    .quick-q:hover { border-color: var(--accent2); background: rgba(255,201,60,0.1); }
+    .quick-q.highlight { border-color: var(--accent); color: var(--accent); background: rgba(0,240,210,0.1); }
+  </style>
+</head>
+<body>
+
+  <nav class="top-nav">
+    <div class="logo">HORIZON</div>
+  </nav>
+
+  <main class="hero-content">
+    <h1>Find Your Bliss</h1>
+    <p>Your Perfect Vacation Awaits</p>
+    <button class="ask-bot-btn" onclick="openBot()">Ask Bot</button>
+  </main>
+
+
+  <div class="bot-modal-overlay" id="botModal">
+    <div class="app-wrapper">
+      
+      <div class="header">
+        <div class="bot-avatar">✈️</div>
+        <div class="header-info">
+          <div class="bot-name">HORIZON</div>
+          <div class="bot-status">
+            <span class="status-dot"></span>
+            CONCIERGE — ONLINE
+          </div>
+        </div>
+        <button class="close-modal-btn" onclick="closeBot()">✕</button>
+      </div>
+
+      <div class="topics-bar">
+        <span class="topics-label">GUIDES://</span>
+        <button class="topic-btn" onclick="askTopic('Give me some smart packing tips')">🧳 Packing</button>
+        <button class="topic-btn" onclick="askTopic('How to find cheap flights?')">🎫 Flights</button>
+        <button class="topic-btn" onclick="askTopic('Tips for booking hotels')">🏨 Hotels</button>
+        <button class="topic-btn" onclick="askTopic('How to handle currency exchange')">💱 Money</button>
+      </div>
+
+      <div class="chat-area" id="chatArea">
+        <div class="welcome-card">
+          <h2>// WELCOME, TRAVELER</h2>
+          <p>I'm <strong>Horizon</strong>, your digital concierge. I can help you with travel logistics, packing tips, or we can start building your next dream itinerary right now.</p>
+          <div class="quick-questions">
+            <button class="quick-q highlight" onclick="startTripPlanning()">🗺️ Plan a Trip</button>
+            <button class="quick-q" onclick="askTopic('Should I use a backpack or suitcase?')">🎒 Luggage</button>
+            <button class="quick-q" onclick="askTopic('When is the best time to buy flights?')">📅 Booking</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-area">
+        <input
+          class="input-field"
+          id="inputField"
+          type="text"
+          placeholder="Type a message..."
+          onkeydown="if(event.key==='Enter') sendMessage()"
+          maxlength="500"
+        />
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">ASK ▶</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // --- Modal Logic ---
+  const modal = document.getElementById('botModal');
+
+  function openBot() {
+    modal.classList.add('active');
+  }
+
+  function closeBot() {
+    modal.classList.remove('active');
+  }
+
+  modal.addEventListener('click', function(event) {
+    if (event.target === modal) {
+      closeBot();
+    }
+  });
+
+
+  // --- Bot Conversation Logic & State Machine ---
+  const chatArea = document.getElementById('chatArea');
+  const inputField = document.getElementById('inputField');
+  const sendBtn = document.getElementById('sendBtn');
+  
+  let isLoading = false;
+  let currentBotState = 'default'; 
+  let travelOrigin = '';
+  let travelDestination = '';
+
+  // Standard FAQ Database
+  const faqDatabase = [
+    { keywords: ["packing", "pack", "luggage", "suitcase", "backpack", "carryon"], answer: "Efficient packing is key to a stress-free trip:\n\n• **Roll, don't fold:** It saves massive amounts of space and reduces wrinkles.\n• **Packing Cubes:** Essential for organizing clothes by type or day.\n• **Suitcase vs Backpack:** Choose a suitcase for city travel, and a large travel backpack if you plan on using hostels or uneven terrain." },
+    { keywords: ["flights", "flight", "cheap", "tickets", "airfare", "booking"], answer: "Finding the best airfare requires strategy:\n\n• **Book in Advance:** For international trips, 2–6 months out is often the 'sweet spot'.\n• **Be Flexible:** Mid-week flights (Tuesday/Wednesday) are usually cheaper.\n• **Aggregator Sites:** Use tools like Skyscanner or Google Flights to compare multiple airlines at once." },
+    { keywords: ["hotels", "hotel", "accommodation"], answer: "Choosing the right place to stay:\n\n• **Read recent reviews:** Focus on comments from the last 3 months.\n• **Map it out:** Before booking, check the location on a map to ensure proximity to public transport.\n• **Book directly:** Sometimes calling the hotel directly yields better perks or flexible cancellation." },
+    { keywords: ["money", "currency", "cash", "atm", "exchange"], answer: "Managing logistics abroad:\n\n• **Use Local ATMs:** You often get a better exchange rate pulling cash from an ATM abroad than using airport exchange booths.\n• **Notify your bank:** Tell your bank your travel dates so they don't freeze your cards.\n• **Get a travel card:** Look for credit cards with *Zero Foreign Transaction Fees*." }
+  ];
+
+  // Specific Destination Database
+  const destinationGuides = {
+    "japan": "• **Tokyo:** For neon lights, sushi, and Akihabara.\n• **Kyoto:** To experience traditional temples and bamboo forests.\n• **Osaka:** The street food capital of the world (try the Takoyaki!).",
+    "italy": "• **Rome:** The Colosseum, Vatican City, and amazing pasta.\n• **Florence:** The heart of the Renaissance and incredible art.\n• **Amalfi Coast:** For breathtaking ocean views and lemon groves.",
+    "france": "• **Paris:** The Eiffel Tower, Louvre, and charming cafes.\n• **Nice:** For the glamorous French Riviera beaches.\n• **Chamonix:** If you love mountains, hiking, and skiing.",
+    "australia": "• **Sydney:** The iconic Opera House and Bondi Beach.\n• **Great Barrier Reef:** World-class snorkeling and diving.\n• **Melbourne:** Famous for its coffee culture and street art.",
+    "usa": "• **New York City:** Broadway, Central Park, and Times Square.\n• **Grand Canyon:** A breathtaking natural wonder in Arizona.\n• **Hawaii:** For volcanic landscapes and perfect beaches.",
+    "india": "• **Agra:** To see the magnificent Taj Mahal.\n• **Jaipur:** The 'Pink City' known for historic forts and palaces.\n• **Kerala:** For relaxing backwaters and lush green landscapes.",
+    "uk": "• **London:** The British Museum, Tower of London, and West End shows.\n• **Edinburgh:** A historic Scottish city with a stunning castle.\n• **Stonehenge:** The mysterious and ancient stone circle.",
+    "canada": "• **Banff National Park:** For unbelievable turquoise lakes and mountains.\n• **Toronto:** The CN Tower and vibrant multicultural neighborhoods.\n• **Vancouver:** A perfect blend of ocean views and city life."
+  };
+
+  // --- Helper Functions ---
+  function getTime() { return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); }
+  
+  // Formats "united states" to "United States" so it looks nice in chat
+  function formatName(str) { 
+      return str.replace(/\b\w/g, char => char.toUpperCase()); 
+  }
+
+  function addMessage(role, text) {
+    const div = document.createElement('div');
+    div.className = `message ${role}`;
+    const isBot = role === 'bot';
+    div.innerHTML = `
+      <div class="msg-avatar">${isBot ? '✈️' : '👤'}</div>
+      <div>
+        <div class="msg-bubble">${escapeHtml(text)}</div>
+        <div class="msg-meta">${isBot ? 'HORIZON' : 'TRAVELER'} · ${getTime()}</div>
+      </div>
+    `;
+    chatArea.appendChild(div);
+    chatArea.scrollTop = chatArea.scrollHeight;
+  }
+
+  function showTyping() {
+    const div = document.createElement('div');
+    div.className = 'typing-indicator';
+    div.id = 'typingIndicator';
+    div.innerHTML = `
+      <div class="msg-avatar bot-avatar" style="width:38px;height:38px;font-size:18px;border-radius:10px;background:rgba(0,240,210,0.1);border:1px solid rgba(0,240,210,0.3);display:flex;align-items:center;justify-content:center;">✈️</div>
+      <div class="typing-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    `;
+    chatArea.appendChild(div);
+    chatArea.scrollTop = chatArea.scrollHeight;
+  }
+
+  function removeTyping() {
+    const el = document.getElementById('typingIndicator');
+    if (el) el.remove();
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+              .replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  }
+
+  function askTopic(text) {
+      inputField.value = text;
+      sendMessage();
+  }
+
+  // Determines airlines based on origin and destination keywords
+  function getAirlines(origin, dest) {
+      let route = (origin + " " + dest).toLowerCase();
+      let suggestions = [];
+
+      if (route.includes("usa") || route.includes("america") || route.includes("us") || route.includes("united states")) {
+          suggestions.push("Delta, United, or American Airlines");
+      }
+      if (route.includes("uk") || route.includes("kingdom") || route.includes("england")) {
+          suggestions.push("British Airways or Virgin Atlantic");
+      }
+      if (route.includes("japan") || route.includes("tokyo")) suggestions.push("ANA (All Nippon Airways) or Japan Airlines");
+      if (route.includes("france")) suggestions.push("Air France");
+      if (route.includes("germany")) suggestions.push("Lufthansa");
+      if (route.includes("uae") || route.includes("emirates") || route.includes("dubai")) suggestions.push("Emirates or Etihad");
+      if (route.includes("australia")) suggestions.push("Qantas");
+      if (route.includes("canada")) suggestions.push("Air Canada");
+      if (route.includes("india")) suggestions.push("Air India or IndiGo");
+      if (route.includes("spain")) suggestions.push("Iberia");
+      
+      if (suggestions.length === 0) {
+          return "major international carriers like **Emirates, Qatar Airways, or Turkish Airlines** (which fly almost everywhere!), or check aggregator sites like Skyscanner.";
+      }
+      return "**" + suggestions.join(", ") + "**, along with standard global aggregators.";
+  }
+
+  // --- Triggers the Planning Flow ---
+  function startTripPlanning() {
+      if (isLoading) return;
+      currentBotState = 'WAITING_FOR_ORIGIN'; 
+      addMessage('user', 'I want to plan a trip.');
+      showTyping();
+      setTimeout(() => {
+          removeTyping();
+          addMessage('bot', "I'd love to help you plan! First, **which country are you traveling FROM?**");
+      }, 600);
+  }
+
+  // --- Main Message Handler ---
+  function sendMessage() {
+    const userText = inputField.value.trim();
+    if (!userText || isLoading) return;
+    
+    inputField.value = '';
+    isLoading = true;
+    sendBtn.disabled = true;
+
+    addMessage('user', userText);
+    showTyping();
+
+    setTimeout(() => {
+        removeTyping();
+        let lowerText = userText.toLowerCase();
+
+        // STATE 1: Waiting for Origin
+        if (currentBotState === 'WAITING_FOR_ORIGIN') {
+            travelOrigin = userText; 
+            currentBotState = 'WAITING_FOR_DESTINATION'; 
+            addMessage('bot', `Awesome, starting from **${formatName(travelOrigin)}**. And **which country are you traveling TO?**`);
+        } 
+        
+        // STATE 2: Waiting for Destination
+        else if (currentBotState === 'WAITING_FOR_DESTINATION') {
+            travelDestination = userText; 
+            currentBotState = 'default'; // Reset bot
+            
+            let prettyOrigin = formatName(travelOrigin);
+            let prettyDest = formatName(travelDestination);
+            
+            // 1. Get Airline Suggestions
+            let airlineRecs = getAirlines(travelOrigin, travelDestination);
+            
+            // 2. Get Country Tips (Check database, or use the confident fallback)
+            let places = "";
+            let foundSpecific = false;
+            
+            for (let country in destinationGuides) {
+                if (lowerText.includes(country)) {
+                    places = destinationGuides[country];
+                    foundSpecific = true;
+                    break;
+                }
+            }
+
+            // The Smart Fallback (Handles any country with confidence!)
+            if (!foundSpecific) {
+                places = `**${prettyDest}** is a brilliant choice! For a trip here, I highly recommend:\n\n• Starting your journey by exploring the vibrant capital city.\n• Checking for nearby UNESCO World Heritage sites and local landmarks.\n• Visiting local markets to try the authentic regional cuisine.`;
+            } else {
+                places = `Here are the top places I recommend visiting in **${prettyDest}**:\n\n${places}`;
+            }
+
+            // 3. Combine it all into one beautiful response
+            let finalResponse = `A trip from ${prettyOrigin} to ${prettyDest}? Amazing!\n\n${places}\n\n✈️ **Flight Options:** For this route, I recommend checking flights with ${airlineRecs}\n\nLet me know if you need tips on packing or managing currency for this trip!`;
+            
+            addMessage('bot', finalResponse);
+        }
+        
+        // STATE 3: Normal FAQ Mode
+        else {
+            let response = "Hmm, I don't see that specific scenario in my database. Try asking me about **packing**, **finding flights**, **booking hotels**, or click **Plan a Trip**!";
+
+            if (lowerText.includes("plan") && lowerText.includes("trip")) {
+                currentBotState = 'WAITING_FOR_ORIGIN';
+                response = "I'd love to help you plan! First, **which country are you traveling FROM?**";
+            } else {
+                for (let entry of faqDatabase) {
+                    if (entry.keywords.some(kw => lowerText.includes(kw))) {
+                        response = entry.answer;
+                        break;
+                    }
+                }
+            }
+            addMessage('bot', response);
+        }
+
+        isLoading = false;
+        sendBtn.disabled = false;
+        inputField.focus();
+
+    }, 800 + Math.random() * 500);
+  }
+</script>
+</body>
+</html>
